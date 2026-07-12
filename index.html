@@ -412,6 +412,26 @@
             animation: slideIn 0.3s ease;
         }
 
+        .auto-refresh-indicator {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 6px 12px;
+            background: #0f172a;
+            border-radius: 6px;
+            margin-top: 12px;
+            font-size: 0.85rem;
+            color: #64748b;
+        }
+
+        .refresh-pulse {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: #06b6d4;
+            animation: pulse 1.5s ease-in-out infinite;
+        }
+
         @keyframes slideIn {
             from {
                 opacity: 0;
@@ -512,6 +532,10 @@
                 <div class="status-dot ready" id="statusDot"></div>
                 <span id="statusText">جاهز للعمل</span>
             </div>
+            <div class="auto-refresh-indicator">
+                <div class="refresh-pulse"></div>
+                <span>التحديث التلقائي: كل 3 ثوانٍ</span>
+            </div>
             <div class="error-message" id="errorMessage"></div>
         </div>
 
@@ -567,16 +591,47 @@
 
     <script>
         let currentPage = 'dashboard';
+        let autoRefreshInterval = null;
+        const AUTO_REFRESH_INTERVAL = 3000; // 3 seconds
 
         // Initialize on page load
         document.addEventListener('DOMContentLoaded', () => {
             loadDashboardData();
+            startAutoRefresh();
         });
 
+        // Start automatic refresh every 3 seconds
+        function startAutoRefresh() {
+            // Clear existing interval if any
+            if (autoRefreshInterval) {
+                clearInterval(autoRefreshInterval);
+            }
+
+            // Set up new interval to fetch data every 3 seconds
+            autoRefreshInterval = setInterval(() => {
+                loadDashboardData(true); // Pass true to indicate it's an auto-refresh
+            }, AUTO_REFRESH_INTERVAL);
+
+            console.log('Auto-refresh started: fetching dashboard_data.json every 3 seconds');
+        }
+
+        // Stop automatic refresh
+        function stopAutoRefresh() {
+            if (autoRefreshInterval) {
+                clearInterval(autoRefreshInterval);
+                autoRefreshInterval = null;
+                console.log('Auto-refresh stopped');
+            }
+        }
+
         // Load dashboard data from JSON
-        function loadDashboardData() {
+        function loadDashboardData(isAutoRefresh = false) {
             const tableContent = document.getElementById('tableContent');
-            tableContent.innerHTML = '<div class="loading"><div class="spinner"></div><span>جاري تحميل البيانات...</span></div>';
+            
+            // Only show loading state on manual refresh, not on auto-refresh
+            if (!isAutoRefresh) {
+                tableContent.innerHTML = '<div class="loading"><div class="spinner"></div><span>جاري تحميل البيانات...</span></div>';
+            }
 
             fetch('dashboard_data.json')
                 .then(response => {
@@ -593,20 +648,57 @@
                         displayProcessTable(data.processes);
                         updateStatistics(data.processes);
                     } else {
+                        // Handle single process object format
                         displayProcessTable([data]);
                         updateStatistics([data]);
+                        updateStatusFromData(data);
+                    }
+                    
+                    // Log successful auto-refresh
+                    if (isAutoRefresh) {
+                        console.log('Auto-refresh completed at:', new Date().toLocaleTimeString());
                     }
                 })
                 .catch(error => {
                     console.error('Error loading data:', error);
-                    showErrorMessage(`خطأ في تحميل البيانات: ${error.message}`);
-                    tableContent.innerHTML = `
-                        <div class="empty-state">
-                            <p>لم يتم تحميل البيانات</p>
-                            <p style="margin-top: 10px; font-size: 0.9rem;">تأكد من وجود ملف dashboard_data.json</p>
-                        </div>
-                    `;
+                    if (!isAutoRefresh) {
+                        showErrorMessage(`خطأ في تحميل البيانات: ${error.message}`);
+                        tableContent.innerHTML = `
+                            <div class="empty-state">
+                                <p>لم يتم تحميل البيانات</p>
+                                <p style="margin-top: 10px; font-size: 0.9rem;">تأكد من وجود ملف dashboard_data.json</p>
+                            </div>
+                        `;
+                    }
                 });
+        }
+
+        // Update status indicator based on data
+        function updateStatusFromData(data) {
+            const statusDot = document.getElementById('statusDot');
+            const statusText = document.getElementById('statusText');
+            
+            if (data.status) {
+                const statusLower = data.status.toLowerCase();
+                
+                if (statusLower === 'running') {
+                    statusDot.className = 'status-dot running';
+                    const progress = data.progress || 0;
+                    statusText.textContent = `جاري التنفيذ... (${progress}% من التقدم)`;
+                } else if (statusLower === 'completed') {
+                    statusDot.className = 'status-dot ready';
+                    statusText.textContent = 'تمت بنجاح! (100% من التقدم)';
+                } else if (statusLower === 'failed') {
+                    statusDot.className = 'status-dot error';
+                    statusText.textContent = 'فشل التنفيذ - يرجى المراجعة';
+                } else if (statusLower === 'pending') {
+                    statusDot.className = 'status-dot running';
+                    statusText.textContent = 'في انتظار البدء...';
+                } else if (statusLower === 'paused') {
+                    statusDot.className = 'status-dot running';
+                    statusText.textContent = 'متوقف مؤقتاً...';
+                }
+            }
         }
 
         // Display process data in table
@@ -642,7 +734,7 @@
                 const statusBadge = getStatusBadge(process.status || process.state);
                 const processName = process.process_name || process.name || `عملية ${index + 1}`;
                 const processId = process.process_id || process.id || `P${1001 + index}`;
-                const startTime = process.start_time || process.timestamp || '-';
+                const startTime = process.start_time || process.timestamp || process.last_updated || '-';
                 const endTime = process.end_time || '-';
                 const duration = process.duration || '-';
                 const progress = process.progress || process.percentage || '0%';
@@ -655,7 +747,7 @@
                         <td>${formatTime(startTime)}</td>
                         <td>${formatTime(endTime)}</td>
                         <td>${duration}</td>
-                        <td>${progress}</td>
+                        <td>${progress}%</td>
                     </tr>
                 `;
             });
@@ -687,7 +779,7 @@
 
             if (statusLower === 'completed' || statusLower === 'مكتملة') {
                 badgeClass = 'completed';
-                displayText = '✓ مكتملة';
+                displayText = '✓ ��كتملة';
             } else if (statusLower === 'failed' || statusLower === 'فاشلة') {
                 badgeClass = 'failed';
                 displayText = '✗ فاشلة';
@@ -749,7 +841,7 @@
 
         // Refresh data
         function refreshData() {
-            loadDashboardData();
+            loadDashboardData(false);
         }
 
         // Export data
@@ -783,7 +875,7 @@
 
         // Show help
         function showHelp() {
-            alert('مرحباً! هذه لوحة التحكم الرئيسية لمنصة الأتمتة الفائقة.\n\nاستخدم الأزرار أعلاه لتشغيل العمليات و[...]
+            alert('مرحباً! هذه لوحة التحكم الرئيسية لمنصة الأتمتة الفائقة.\n\nاستخدم الأزرار أعلاه لتشغيل العمليات والتحكم فيها.\n\nملاحظة: البيانات تُحدث تلقائياً كل 3 ثوانٍ من ملف dashboard_data.json');
         }
 
         // Show error message
@@ -796,6 +888,11 @@
                 errorDiv.classList.remove('show');
             }, 5000);
         }
+
+        // Cleanup on page unload
+        window.addEventListener('beforeunload', () => {
+            stopAutoRefresh();
+        });
     </script>
 </body>
 </html>
