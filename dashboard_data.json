@@ -1,0 +1,146 @@
+{
+  "metadata": {
+    "generated_at_utc": "2026-07-13T00:00:00Z",
+    "source_file": "hyper_automation_platform_data.json",
+    "data_status": "partial_from_connected_github_integration",
+    "note": "Repository file contents were not accessible in this session; dashboard values are based on available repository metadata, branches, commits, issues, and pull requests."
+  },
+  "project": {
+    "name": "hyper-automation-platform",
+    "full_name": "za310627-spec/hyper-automation-platform",
+    "description": "Transparent Conversion Funnel & Micro-SaaS Platform 2026",
+    "owner": "za310627-spec",
+    "repository_url": "https://github.com/za310627-spec/hyper-automation-platform",
+    "default_branch": "main",
+    "stars": 0
+  },
+  "summary": {
+    "branches": 1,
+    "commits": 7,
+    "issues": 0,
+    "pull_requests": 0,
+    "included_file_contents": false
+  },
+  "kpis": [
+    {
+      "label": "Branches",
+      "value": 1,
+      "unit": "branch"
+    },
+    {
+      "label": "Commits",
+      "value": 7,
+      "unit": "commits"
+    },
+    {
+      "label": "Open/All Issues",
+      "value": 0,
+      "unit": "issues"
+    },
+    {
+      "label": "Pull Requests",
+      "value": 0,
+      "unit": "pull requests"
+    }
+  ],
+  "branches": [
+    {
+      "name": "main",
+      "commit_short_sha": "e59bde4",
+      "protected": null
+    }
+  ],
+  "recent_commits": [
+    {
+      "short_sha": "e59bde4",
+      "sha": "e59bde4cf2413fae04e30d0ebf97b29d123d8319",
+      "message": "Fix workflow issues and enhance error diagnostics",
+      "author": "za310627-spec",
+      "date": "2026-07-12",
+      "url": "https://github.com/za310627-spec/hyper-automation-platform/commit/e59bde4cf2413fae04e30d0ebf97b29d123d8319"
+    },
+    {
+      "short_sha": "9585428",
+      "sha": "958542808af85e106c33a12310e80dd17f763018",
+      "message": "Update run_automation.yml",
+      "author": "za310627-spec",
+      "date": "2026-07-12",
+      "url": "https://github.com/za310627-spec/hyper-automation-platform/commit/958542808af85e106c33a12310e80dd17f763018"
+    },
+    {
+      "short_sha": "db80a22",
+      "sha": "db80a22a369ac84af8670d79522062d77fab1c12",
+      "message": "Add GitHub Actions workflow for Hyper Automation Engine",
+      "author": "za310627-spec",
+      "date": "2026-07-12",
+      "url": "https://github.com/za310627-spec/hyper-automation-platform/commit/db80a22a369ac84af8670d79522062d77fab1c12"
+    },
+    {
+      "short_sha": "05ada06",
+      "sha": "05ada06430e36328d925cd46f4b494436811a9e1",
+      "message": "Add dynamic data fetching from dashboard_data.json with graceful error handling",
+      "author": "za310627-spec",
+      "date": "2026-07-12",
+      "url": "https://github.com/za310627-spec/hyper-automation-platform/commit/05ada06430e36328d925cd46f4b494436811a9e1"
+    },
+    {
+      "short_sha": "db7d51f",
+      "sha": "db7d51febf33643083e0dc4028489c77ce04d41c",
+      "message": "Add automation_engine.py with web scraping, data processing, and error handling",
+      "author": "za310627-spec",
+      "date": "2026-07-12",
+      "url": "https://github.com/za310627-spec/hyper-automation-platform/commit/db7d51febf33643083e0dc4028489c77ce04d41c"
+    },
+    {
+      "short_sha": "570f4d8",
+      "sha": "570f4d8397be6d589e62b7ac77a87fb1fdb92802",
+      "message": "Create comprehensive index.html with dark theme, responsive layout, and sample d...",
+      "author": "za310627-spec",
+      "date": "2026-07-12",
+      "url": "https://github.com/za310627-spec/hyper-automation-platform/commit/570f4d8397be6d589e62b7ac77a87fb1fdb92802"
+    },
+    {
+      "short_sha": "c214f59",
+      "sha": "c214f599b5a9c7161873f80791f1230c6fcff82b",
+      "message": "Initial commit",
+      "author": "za310627-spec",
+      "date": "2026-07-12",
+      "url": "https://github.com/za310627-spec/hyper-automation-platform/commit/c214f599b5a9c7161873f80791f1230c6fcff82b"
+    }
+  ],
+  "issues": [],
+  "pull_requests": [],
+  "charts": {
+    "activity_by_date": [
+      {
+        "date": "2026-07-12",
+        "commits": 7
+      }
+    ],
+    "repository_objects": [
+      {
+        "type": "Branches",
+        "count": 1
+      },
+      {
+        "type": "Commits",
+        "count": 7
+      },
+      {
+        "type": "Issues",
+        "count": 0
+      },
+      {
+        "type": "Pull Requests",
+        "count": 0
+      }
+    ]
+  },
+  "access_notes": {
+    "public_web_page_status": "GitHub public page returned Page not found during unauthenticated crawl.",
+    "public_api_status": "GitHub REST API returned 404 Not Found for unauthenticated repository metadata.",
+    "git_clone_status": "git clone over HTTPS failed because GitHub requested authentication.",
+    "connected_github_integration_status": "Repository metadata was accessible via the connected GitHub integration.",
+    "file_contents_status": "File tree/content extraction was not available through the exposed GitHub integration tools in this session; therefore source file contents are not included."
+  }
+}
