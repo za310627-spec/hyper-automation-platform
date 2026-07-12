@@ -1,0 +1,1050 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Hyper Automation Platform - Dashboard</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --primary: #6366f1;
+            --primary-dark: #4f46e5;
+            --primary-light: #818cf8;
+            --secondary: #ec4899;
+            --success: #10b981;
+            --warning: #f59e0b;
+            --danger: #ef4444;
+            --dark-bg: #0f172a;
+            --dark-surface: #1e293b;
+            --dark-surface-light: #334155;
+            --dark-border: #475569;
+            --text-primary: #f1f5f9;
+            --text-secondary: #cbd5e1;
+            --text-tertiary: #94a3b8;
+            --shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.5);
+            --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+            background-color: var(--dark-bg);
+            color: var(--text-primary);
+            overflow-x: hidden;
+        }
+
+        /* Layout */
+        .container {
+            display: flex;
+            min-height: 100vh;
+        }
+
+        /* Sidebar */
+        .sidebar {
+            width: 280px;
+            background-color: var(--dark-surface);
+            border-right: 1px solid var(--dark-border);
+            padding: 24px 0;
+            position: fixed;
+            height: 100vh;
+            overflow-y: auto;
+            transition: var(--transition);
+            z-index: 1000;
+        }
+
+        .sidebar.collapsed {
+            width: 80px;
+        }
+
+        .sidebar::-webkit-scrollbar {
+            width: 6px;
+        }
+
+        .sidebar::-webkit-scrollbar-track {
+            background: transparent;
+        }
+
+        .sidebar::-webkit-scrollbar-thumb {
+            background: var(--dark-border);
+            border-radius: 3px;
+        }
+
+        .sidebar::-webkit-scrollbar-thumb:hover {
+            background: var(--dark-surface-light);
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 0 20px;
+            margin-bottom: 32px;
+            color: var(--primary);
+            font-weight: 700;
+            font-size: 18px;
+            text-decoration: none;
+            transition: var(--transition);
+        }
+
+        .sidebar.collapsed .logo span {
+            display: none;
+        }
+
+        .logo-icon {
+            width: 32px;
+            height: 32px;
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 900;
+            color: white;
+        }
+
+        .nav-menu {
+            list-style: none;
+        }
+
+        .nav-item {
+            margin: 8px 12px;
+        }
+
+        .nav-link {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 12px 16px;
+            color: var(--text-secondary);
+            text-decoration: none;
+            border-radius: 8px;
+            transition: var(--transition);
+            font-size: 14px;
+            position: relative;
+        }
+
+        .nav-link:hover {
+            background-color: var(--dark-surface-light);
+            color: var(--text-primary);
+        }
+
+        .nav-link.active {
+            background-color: var(--primary);
+            color: white;
+        }
+
+        .nav-link.active::before {
+            content: '';
+            position: absolute;
+            left: 0;
+            top: 0;
+            bottom: 0;
+            width: 3px;
+            background: white;
+            border-radius: 0 3px 3px 0;
+        }
+
+        .nav-icon {
+            width: 20px;
+            height: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+        }
+
+        .sidebar.collapsed .nav-link span {
+            display: none;
+        }
+
+        .sidebar.collapsed .nav-link {
+            justify-content: center;
+            padding: 12px;
+        }
+
+        /* Main Content */
+        .main {
+            flex: 1;
+            margin-left: 280px;
+            transition: var(--transition);
+        }
+
+        .sidebar.collapsed ~ .main {
+            margin-left: 80px;
+        }
+
+        /* Header */
+        .header {
+            background-color: var(--dark-surface);
+            border-bottom: 1px solid var(--dark-border);
+            padding: 16px 32px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .header-left {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+        }
+
+        .toggle-sidebar {
+            background: none;
+            border: none;
+            color: var(--text-primary);
+            cursor: pointer;
+            font-size: 20px;
+            width: 40px;
+            height: 40px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 8px;
+            transition: var(--transition);
+        }
+
+        .toggle-sidebar:hover {
+            background-color: var(--dark-surface-light);
+        }
+
+        .search-bar {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            background-color: var(--dark-surface-light);
+            border: 1px solid var(--dark-border);
+            border-radius: 8px;
+            padding: 8px 12px;
+            width: 300px;
+        }
+
+        .search-bar input {
+            background: none;
+            border: none;
+            color: var(--text-primary);
+            width: 100%;
+            outline: none;
+            font-size: 14px;
+        }
+
+        .search-bar input::placeholder {
+            color: var(--text-tertiary);
+        }
+
+        .header-right {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+        }
+
+        .header-icon {
+            width: 40px;
+            height: 40px;
+            border-radius: 8px;
+            background-color: var(--dark-surface-light);
+            border: 1px solid var(--dark-border);
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--text-secondary);
+            transition: var(--transition);
+            font-size: 18px;
+        }
+
+        .header-icon:hover {
+            background-color: var(--primary);
+            color: white;
+            border-color: var(--primary);
+        }
+
+        .user-avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: 600;
+            cursor: pointer;
+        }
+
+        /* Content Area */
+        .content {
+            padding: 32px;
+        }
+
+        /* Page Header */
+        .page-header {
+            margin-bottom: 32px;
+        }
+
+        .page-title {
+            font-size: 28px;
+            font-weight: 700;
+            margin-bottom: 8px;
+        }
+
+        .page-subtitle {
+            color: var(--text-secondary);
+            font-size: 14px;
+        }
+
+        /* Stats Grid */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+            gap: 20px;
+            margin-bottom: 32px;
+        }
+
+        .stat-card {
+            background-color: var(--dark-surface);
+            border: 1px solid var(--dark-border);
+            border-radius: 12px;
+            padding: 24px;
+            transition: var(--transition);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .stat-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 3px;
+            background: linear-gradient(90deg, var(--primary), var(--secondary));
+            opacity: 0;
+            transition: var(--transition);
+        }
+
+        .stat-card:hover {
+            border-color: var(--primary);
+            box-shadow: var(--shadow);
+        }
+
+        .stat-card:hover::before {
+            opacity: 1;
+        }
+
+        .stat-label {
+            color: var(--text-secondary);
+            font-size: 13px;
+            font-weight: 500;
+            margin-bottom: 12px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .stat-value {
+            font-size: 32px;
+            font-weight: 700;
+            margin-bottom: 12px;
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .stat-change {
+            display: inline-block;
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-size: 12px;
+            font-weight: 600;
+        }
+
+        .stat-change.positive {
+            background-color: rgba(16, 185, 129, 0.1);
+            color: var(--success);
+        }
+
+        .stat-change.negative {
+            background-color: rgba(239, 68, 68, 0.1);
+            color: var(--danger);
+        }
+
+        /* Tables */
+        .section {
+            margin-bottom: 32px;
+        }
+
+        .section-title {
+            font-size: 18px;
+            font-weight: 600;
+            margin-bottom: 16px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .table-container {
+            background-color: var(--dark-surface);
+            border: 1px solid var(--dark-border);
+            border-radius: 12px;
+            overflow: hidden;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        thead {
+            background-color: var(--dark-surface-light);
+            border-bottom: 1px solid var(--dark-border);
+        }
+
+        th {
+            padding: 16px;
+            text-align: left;
+            font-size: 13px;
+            font-weight: 600;
+            color: var(--text-secondary);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        td {
+            padding: 16px;
+            border-bottom: 1px solid var(--dark-border);
+            font-size: 14px;
+        }
+
+        tbody tr {
+            transition: var(--transition);
+        }
+
+        tbody tr:hover {
+            background-color: var(--dark-surface-light);
+        }
+
+        tbody tr:last-child td {
+            border-bottom: none;
+        }
+
+        .status-badge {
+            display: inline-block;
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 600;
+        }
+
+        .status-badge.active {
+            background-color: rgba(16, 185, 129, 0.2);
+            color: var(--success);
+        }
+
+        .status-badge.pending {
+            background-color: rgba(245, 158, 11, 0.2);
+            color: var(--warning);
+        }
+
+        .status-badge.inactive {
+            background-color: rgba(107, 114, 128, 0.2);
+            color: #9ca3af;
+        }
+
+        .status-badge.error {
+            background-color: rgba(239, 68, 68, 0.2);
+            color: var(--danger);
+        }
+
+        .progress-bar {
+            width: 100%;
+            height: 6px;
+            background-color: var(--dark-border);
+            border-radius: 3px;
+            overflow: hidden;
+            display: inline-block;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, var(--primary), var(--secondary));
+            border-radius: 3px;
+            transition: var(--transition);
+        }
+
+        /* Buttons */
+        .btn {
+            padding: 10px 16px;
+            border: none;
+            border-radius: 8px;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: var(--transition);
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .btn-primary {
+            background-color: var(--primary);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background-color: var(--primary-dark);
+            box-shadow: var(--shadow);
+        }
+
+        .btn-secondary {
+            background-color: var(--dark-surface-light);
+            color: var(--text-primary);
+            border: 1px solid var(--dark-border);
+        }
+
+        .btn-secondary:hover {
+            background-color: var(--dark-border);
+        }
+
+        .btn-sm {
+            padding: 6px 12px;
+            font-size: 12px;
+        }
+
+        /* Charts Placeholder */
+        .chart-container {
+            background-color: var(--dark-surface);
+            border: 1px solid var(--dark-border);
+            border-radius: 12px;
+            padding: 24px;
+            height: 300px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--text-tertiary);
+        }
+
+        /* Grid Layouts */
+        .grid-2 {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
+            gap: 20px;
+            margin-bottom: 32px;
+        }
+
+        /* Responsive */
+        @media (max-width: 1200px) {
+            .stats-grid {
+                grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            }
+
+            .grid-2 {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .sidebar {
+                width: 80px;
+            }
+
+            .sidebar.collapsed {
+                width: 80px;
+            }
+
+            .main {
+                margin-left: 80px;
+            }
+
+            .sidebar.collapsed ~ .main {
+                margin-left: 80px;
+            }
+
+            .logo span {
+                display: none;
+            }
+
+            .nav-link span {
+                display: none;
+            }
+
+            .nav-link {
+                justify-content: center;
+                padding: 12px;
+            }
+
+            .header {
+                padding: 12px 16px;
+            }
+
+            .search-bar {
+                width: 200px;
+            }
+
+            .content {
+                padding: 16px;
+            }
+
+            .stats-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .page-title {
+                font-size: 22px;
+            }
+
+            table {
+                font-size: 12px;
+            }
+
+            th, td {
+                padding: 12px 8px;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .header-left {
+                gap: 8px;
+            }
+
+            .search-bar {
+                display: none;
+            }
+
+            .header-right {
+                gap: 8px;
+            }
+
+            .header-icon {
+                width: 36px;
+                height: 36px;
+                font-size: 16px;
+            }
+
+            .user-avatar {
+                width: 36px;
+                height: 36px;
+                font-size: 12px;
+            }
+
+            .page-title {
+                font-size: 18px;
+            }
+
+            .stat-value {
+                font-size: 24px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Sidebar -->
+        <aside class="sidebar" id="sidebar">
+            <a href="#" class="logo">
+                <div class="logo-icon">⚙️</div>
+                <span>HyperAuto</span>
+            </a>
+
+            <nav>
+                <ul class="nav-menu">
+                    <li class="nav-item">
+                        <a href="#" class="nav-link active">
+                            <span class="nav-icon">📊</span>
+                            <span>Dashboard</span>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="#" class="nav-link">
+                            <span class="nav-icon">⚙️</span>
+                            <span>Automations</span>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="#" class="nav-link">
+                            <span class="nav-icon">📈</span>
+                            <span>Conversions</span>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="#" class="nav-link">
+                            <span class="nav-icon">👥</span>
+                            <span>Customers</span>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="#" class="nav-link">
+                            <span class="nav-icon">💼</span>
+                            <span>Workflows</span>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="#" class="nav-link">
+                            <span class="nav-icon">📋</span>
+                            <span>Reports</span>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="#" class="nav-link">
+                            <span class="nav-icon">⚡</span>
+                            <span>Integrations</span>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="#" class="nav-link">
+                            <span class="nav-icon">⚙️</span>
+                            <span>Settings</span>
+                        </a>
+                    </li>
+                </ul>
+            </nav>
+        </aside>
+
+        <!-- Main Content -->
+        <main class="main">
+            <!-- Header -->
+            <header class="header">
+                <div class="header-left">
+                    <button class="toggle-sidebar" id="toggleSidebar">☰</button>
+                    <div class="search-bar">
+                        <span>🔍</span>
+                        <input type="text" placeholder="Search automations, workflows...">
+                    </div>
+                </div>
+
+                <div class="header-right">
+                    <button class="header-icon" title="Notifications">🔔</button>
+                    <button class="header-icon" title="Messages">💬</button>
+                    <button class="header-icon" title="Settings">⚙️</button>
+                    <div class="user-avatar" title="User Profile">JD</div>
+                </div>
+            </header>
+
+            <!-- Content -->
+            <div class="content">
+                <!-- Page Header -->
+                <div class="page-header">
+                    <h1 class="page-title">Dashboard</h1>
+                    <p class="page-subtitle">Welcome back! Here's your automation platform overview.</p>
+                </div>
+
+                <!-- Stats Grid -->
+                <div class="stats-grid">
+                    <div class="stat-card">
+                        <div class="stat-label">Active Automations</div>
+                        <div class="stat-value">127</div>
+                        <span class="stat-change positive">↑ 12% from last week</span>
+                    </div>
+
+                    <div class="stat-card">
+                        <div class="stat-label">Conversion Rate</div>
+                        <div class="stat-value">3.8%</div>
+                        <span class="stat-change positive">↑ 0.5% from last week</span>
+                    </div>
+
+                    <div class="stat-card">
+                        <div class="stat-label">Total Revenue</div>
+                        <div class="stat-value">$24.5K</div>
+                        <span class="stat-change positive">↑ 18% from last week</span>
+                    </div>
+
+                    <div class="stat-card">
+                        <div class="stat-label">Processed Tasks</div>
+                        <div class="stat-value">8,942</div>
+                        <span class="stat-change negative">↓ 3% from last week</span>
+                    </div>
+                </div>
+
+                <!-- Charts Grid -->
+                <div class="grid-2">
+                    <div class="section">
+                        <h2 class="section-title">📊 Revenue Trend</h2>
+                        <div class="chart-container">
+                            <div style="text-align: center;">
+                                <div style="font-size: 48px; margin-bottom: 12px;">📈</div>
+                                <div>Chart visualization goes here</div>
+                                <div style="font-size: 12px; color: var(--text-tertiary); margin-top: 8px;">
+                                    Integrate with Chart.js or similar
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="section">
+                        <h2 class="section-title">🎯 Conversion Funnel</h2>
+                        <div class="chart-container">
+                            <div style="text-align: center;">
+                                <div style="font-size: 48px; margin-bottom: 12px;">🔗</div>
+                                <div>Funnel visualization goes here</div>
+                                <div style="font-size: 12px; color: var(--text-tertiary); margin-top: 8px;">
+                                    Step-by-step conversion stages
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Recent Automations -->
+                <div class="section">
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px;">
+                        <h2 class="section-title">⚙️ Recent Automations</h2>
+                        <button class="btn btn-primary btn-sm">+ New Automation</button>
+                    </div>
+
+                    <div class="table-container">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>Name</th>
+                                    <th>Type</th>
+                                    <th>Status</th>
+                                    <th>Executions</th>
+                                    <th>Success Rate</th>
+                                    <th>Last Run</th>
+                                    <th>Action</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td style="font-weight: 600;">Email Campaign Auto</td>
+                                    <td>Email</td>
+                                    <td><span class="status-badge active">Active</span></td>
+                                    <td>3,421</td>
+                                    <td>
+                                        <div style="display: flex; align-items: center; gap: 8px;">
+                                            <div class="progress-bar">
+                                                <div class="progress-fill" style="width: 95%;"></div>
+                                            </div>
+                                            95%
+                                        </div>
+                                    </td>
+                                    <td>2 minutes ago</td>
+                                    <td><button class="btn btn-secondary btn-sm">Edit</button></td>
+                                </tr>
+                                <tr>
+                                    <td style="font-weight: 600;">Lead Scoring Pipeline</td>
+                                    <td>CRM</td>
+                                    <td><span class="status-badge active">Active</span></td>
+                                    <td>1,892</td>
+                                    <td>
+                                        <div style="display: flex; align-items: center; gap: 8px;">
+                                            <div class="progress-bar">
+                                                <div class="progress-fill" style="width: 88%;"></div>
+                                            </div>
+                                            88%
+                                        </div>
+                                    </td>
+                                    <td>5 minutes ago</td>
+                                    <td><button class="btn btn-secondary btn-sm">Edit</button></td>
+                                </tr>
+                                <tr>
+                                    <td style="font-weight: 600;">Social Media Scheduler</td>
+                                    <td>Social</td>
+                                    <td><span class="status-badge pending">Pending</span></td>
+                                    <td>562</td>
+                                    <td>
+                                        <div style="display: flex; align-items: center; gap: 8px;">
+                                            <div class="progress-bar">
+                                                <div class="progress-fill" style="width: 72%;"></div>
+                                            </div>
+                                            72%
+                                        </div>
+                                    </td>
+                                    <td>1 hour ago</td>
+                                    <td><button class="btn btn-secondary btn-sm">Edit</button></td>
+                                </tr>
+                                <tr>
+                                    <td style="font-weight: 600;">Invoice Generation Bot</td>
+                                    <td>Finance</td>
+                                    <td><span class="status-badge active">Active</span></td>
+                                    <td>2,145</td>
+                                    <td>
+                                        <div style="display: flex; align-items: center; gap: 8px;">
+                                            <div class="progress-bar">
+                                                <div class="progress-fill" style="width: 92%;"></div>
+                                            </div>
+                                            92%
+                                        </div>
+                                    </td>
+                                    <td>10 minutes ago</td>
+                                    <td><button class="btn btn-secondary btn-sm">Edit</button></td>
+                                </tr>
+                                <tr>
+                                    <td style="font-weight: 600;">Data Sync Service</td>
+                                    <td>Integration</td>
+                                    <td><span class="status-badge error">Error</span></td>
+                                    <td>421</td>
+                                    <td>
+                                        <div style="display: flex; align-items: center; gap: 8px;">
+                                            <div class="progress-bar">
+                                                <div class="progress-fill" style="width: 45%;"></div>
+                                            </div>
+                                            45%
+                                        </div>
+                                    </td>
+                                    <td>45 minutes ago</td>
+                                    <td><button class="btn btn-secondary btn-sm">Edit</button></td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <!-- Conversion Funnel -->
+                <div class="section">
+                    <h2 class="section-title">🔗 Conversion Funnel Stages</h2>
+
+                    <div class="table-container">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>Stage</th>
+                                    <th>Visitors</th>
+                                    <th>Conversion %</th>
+                                    <th>Drop Rate</th>
+                                    <th>Avg. Time</th>
+                                    <th>Optimization</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td style="font-weight: 600;">Landing Page</td>
+                                    <td>45,230</td>
+                                    <td>
+                                        <div style="display: flex; align-items: center; gap: 8px;">
+                                            <div class="progress-bar">
+                                                <div class="progress-fill" style="width: 100%;"></div>
+                                            </div>
+                                            100%
+                                        </div>
+                                    </td>
+                                    <td><span class="status-badge negative">0%</span></td>
+                                    <td>2m 15s</td>
+                                    <td><button class="btn btn-secondary btn-sm">Optimize</button></td>
+                                </tr>
+                                <tr>
+                                    <td style="font-weight: 600;">Sign Up</td>
+                                    <td>12,890</td>
+                                    <td>
+                                        <div style="display: flex; align-items: center; gap: 8px;">
+                                            <div class="progress-bar">
+                                                <div class="progress-fill" style="width: 85%;"></div>
+                                            </div>
+                                            28.5%
+                                        </div>
+                                    </td>
+                                    <td><span class="status-badge negative">71.5%</span></td>
+                                    <td>3m 42s</td>
+                                    <td><button class="btn btn-secondary btn-sm">Optimize</button></td>
+                                </tr>
+                                <tr>
+                                    <td style="font-weight: 600;">Email Verification</td>
+                                    <td>10,654</td>
+                                    <td>
+                                        <div style="display: flex; align-items: center; gap: 8px;">
+                                            <div class="progress-bar">
+                                                <div class="progress-fill" style="width: 82%;"></div>
+                                            </div>
+                                            82.6%</                                        </div>
+                                    </td>
+                                    <td><span class="status-badge negative">17.4%</span></td>
+                                    <td>1m 08s</td>
+                                    <td><button class="btn btn-secondary btn-sm">Optimize</button></td>
+                                </tr>
+                                <tr>
+                                    <td style="font-weight: 600;">Plan Selection</td>
+                                    <td>8,792</td>
+                                    <td>
+                                        <div style="display: flex; align-items: center; gap: 8px;">
+                                            <div class="progress-bar">
+                                                <div class="progress-fill" style="width: 73%;"></div>
+                                            </div>
+                                            82.5%
+                                        </div>
+                                    </td>
+                                    <td><span class="status-badge warning">17.5%</span></td>
+                                    <td>4m 32s</td>
+                                    <td><button class="btn btn-secondary btn-sm">Optimize</button></td>
+                                </tr>
+                                <tr>
+                                    <td style="font-weight: 600;">Payment</td>
+                                    <td>6,234</td>
+                                    <td>
+                                        <div style="display: flex; align-items: center; gap: 8px;">
+                                            <div class="progress-bar">
+                                                <div class="progress-fill" style="width: 71%;"></div>
+                                            </div>
+                                            70.9%
+                                        </div>
+                                    </td>
+                                    <td><span class="status-badge warning">29.1%</span></td>
+                                    <td>2m 55s</td>
+                                    <td><button class="btn btn-secondary btn-sm">Optimize</button></td>
+                                </tr>
+                                <tr>
+                                    <td style="font-weight: 600;">Account Setup</td>
+                                    <td>4,412</td>
+                                    <td>
+                                        <div style="display: flex; align-items: center; gap: 8px;">
+                                            <div class="progress-bar">
+                                                <div class="progress-fill" style="width: 70%;"></div>
+                                            </div>
+                                            70.7%
+                                        </div>
+                                    </td>
+                                    <td><span class="status-badge negative">29.3%</span></td>
+                                    <td>6m 18s</td>
+                                    <td><button class="btn btn-secondary btn-sm">Optimize</button></td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <script>
+        // Toggle Sidebar
+        const toggleButton = document.getElementById('toggleSidebar');
+        const sidebar = document.getElementById('sidebar');
+
+        toggleButton.addEventListener('click', () => {
+            sidebar.classList.toggle('collapsed');
+        });
+
+        // Active Link
+        document.querySelectorAll('.nav-link').forEach(link => {
+            link.addEventListener('click', (e) => {
+                if (e.target.closest('.nav-link')) {
+                    document.querySelectorAll('.nav-link').forEach(l => l.classList.remove('active'));
+                    e.target.closest('.nav-link').classList.add('active');
+                }
+            });
+        });
+
+        // Search functionality placeholder
+        document.querySelector('.search-bar input')?.addEventListener('input', (e) => {
+            console.log('Search:', e.target.value);
+        });
+
+        // Responsive sidebar for mobile
+        if (window.innerWidth < 768) {
+            sidebar.classList.add('collapsed');
+        }
+
+        window.addEventListener('resize', () => {
+            if (window.innerWidth < 768) {
+                sidebar.classList.add('collapsed');
+            }
+        });
+    </script>
+</body>
+</html>
