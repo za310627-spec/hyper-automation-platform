@@ -300,6 +300,47 @@
             font-size: 14px;
         }
 
+        /* Status Badge */
+        .data-status {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 6px 12px;
+            border-radius: 6px;
+            font-size: 12px;
+            font-weight: 600;
+            margin-bottom: 16px;
+        }
+
+        .data-status.loading {
+            background-color: rgba(99, 102, 241, 0.1);
+            color: var(--primary);
+        }
+
+        .data-status.loaded {
+            background-color: rgba(16, 185, 129, 0.1);
+            color: var(--success);
+        }
+
+        .data-status.error {
+            background-color: rgba(239, 68, 68, 0.1);
+            color: var(--danger);
+        }
+
+        .spinner {
+            display: inline-block;
+            width: 12px;
+            height: 12px;
+            border: 2px solid rgba(99, 102, 241, 0.3);
+            border-top-color: var(--primary);
+            border-radius: 50%;
+            animation: spin 0.6s linear infinite;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
         /* Stats Grid */
         .stats-grid {
             display: grid;
@@ -395,6 +436,27 @@
             border: 1px solid var(--dark-border);
             border-radius: 12px;
             overflow: hidden;
+        }
+
+        .empty-state {
+            padding: 40px 20px;
+            text-align: center;
+            color: var(--text-tertiary);
+        }
+
+        .empty-state-icon {
+            font-size: 48px;
+            margin-bottom: 16px;
+        }
+
+        .empty-state-text {
+            font-size: 14px;
+            margin-bottom: 8px;
+        }
+
+        .empty-state-subtext {
+            font-size: 12px;
+            color: var(--text-tertiary);
         }
 
         table {
@@ -722,7 +784,7 @@
                 <div class="header-right">
                     <button class="header-icon" title="Notifications">🔔</button>
                     <button class="header-icon" title="Messages">💬</button>
-                    <button class="header-icon" title="Settings">⚙️</button>
+                    <button class="header-icon" id="refreshBtn" title="Refresh Data">🔄</button>
                     <div class="user-avatar" title="User Profile">JD</div>
                 </div>
             </header>
@@ -733,33 +795,15 @@
                 <div class="page-header">
                     <h1 class="page-title">Dashboard</h1>
                     <p class="page-subtitle">Welcome back! Here's your automation platform overview.</p>
+                    <div id="dataStatus" class="data-status loading">
+                        <span class="spinner"></span>
+                        <span>Loading dashboard data...</span>
+                    </div>
                 </div>
 
                 <!-- Stats Grid -->
-                <div class="stats-grid">
-                    <div class="stat-card">
-                        <div class="stat-label">Active Automations</div>
-                        <div class="stat-value">127</div>
-                        <span class="stat-change positive">↑ 12% from last week</span>
-                    </div>
-
-                    <div class="stat-card">
-                        <div class="stat-label">Conversion Rate</div>
-                        <div class="stat-value">3.8%</div>
-                        <span class="stat-change positive">↑ 0.5% from last week</span>
-                    </div>
-
-                    <div class="stat-card">
-                        <div class="stat-label">Total Revenue</div>
-                        <div class="stat-value">$24.5K</div>
-                        <span class="stat-change positive">↑ 18% from last week</span>
-                    </div>
-
-                    <div class="stat-card">
-                        <div class="stat-label">Processed Tasks</div>
-                        <div class="stat-value">8,942</div>
-                        <span class="stat-change negative">↓ 3% from last week</span>
-                    </div>
+                <div class="stats-grid" id="statsGrid">
+                    <!-- Stats will be populated here -->
                 </div>
 
                 <!-- Charts Grid -->
@@ -799,7 +843,7 @@
                     </div>
 
                     <div class="table-container">
-                        <table>
+                        <table id="automationsTable">
                             <thead>
                                 <tr>
                                     <th>Name</th>
@@ -811,89 +855,15 @@
                                     <th>Action</th>
                                 </tr>
                             </thead>
-                            <tbody>
-                                <tr>
-                                    <td style="font-weight: 600;">Email Campaign Auto</td>
-                                    <td>Email</td>
-                                    <td><span class="status-badge active">Active</span></td>
-                                    <td>3,421</td>
-                                    <td>
-                                        <div style="display: flex; align-items: center; gap: 8px;">
-                                            <div class="progress-bar">
-                                                <div class="progress-fill" style="width: 95%;"></div>
-                                            </div>
-                                            95%
-                                        </div>
-                                    </td>
-                                    <td>2 minutes ago</td>
-                                    <td><button class="btn btn-secondary btn-sm">Edit</button></td>
-                                </tr>
-                                <tr>
-                                    <td style="font-weight: 600;">Lead Scoring Pipeline</td>
-                                    <td>CRM</td>
-                                    <td><span class="status-badge active">Active</span></td>
-                                    <td>1,892</td>
-                                    <td>
-                                        <div style="display: flex; align-items: center; gap: 8px;">
-                                            <div class="progress-bar">
-                                                <div class="progress-fill" style="width: 88%;"></div>
-                                            </div>
-                                            88%
-                                        </div>
-                                    </td>
-                                    <td>5 minutes ago</td>
-                                    <td><button class="btn btn-secondary btn-sm">Edit</button></td>
-                                </tr>
-                                <tr>
-                                    <td style="font-weight: 600;">Social Media Scheduler</td>
-                                    <td>Social</td>
-                                    <td><span class="status-badge pending">Pending</span></td>
-                                    <td>562</td>
-                                    <td>
-                                        <div style="display: flex; align-items: center; gap: 8px;">
-                                            <div class="progress-bar">
-                                                <div class="progress-fill" style="width: 72%;"></div>
-                                            </div>
-                                            72%
-                                        </div>
-                                    </td>
-                                    <td>1 hour ago</td>
-                                    <td><button class="btn btn-secondary btn-sm">Edit</button></td>
-                                </tr>
-                                <tr>
-                                    <td style="font-weight: 600;">Invoice Generation Bot</td>
-                                    <td>Finance</td>
-                                    <td><span class="status-badge active">Active</span></td>
-                                    <td>2,145</td>
-                                    <td>
-                                        <div style="display: flex; align-items: center; gap: 8px;">
-                                            <div class="progress-bar">
-                                                <div class="progress-fill" style="width: 92%;"></div>
-                                            </div>
-                                            92%
-                                        </div>
-                                    </td>
-                                    <td>10 minutes ago</td>
-                                    <td><button class="btn btn-secondary btn-sm">Edit</button></td>
-                                </tr>
-                                <tr>
-                                    <td style="font-weight: 600;">Data Sync Service</td>
-                                    <td>Integration</td>
-                                    <td><span class="status-badge error">Error</span></td>
-                                    <td>421</td>
-                                    <td>
-                                        <div style="display: flex; align-items: center; gap: 8px;">
-                                            <div class="progress-bar">
-                                                <div class="progress-fill" style="width: 45%;"></div>
-                                            </div>
-                                            45%
-                                        </div>
-                                    </td>
-                                    <td>45 minutes ago</td>
-                                    <td><button class="btn btn-secondary btn-sm">Edit</button></td>
-                                </tr>
+                            <tbody id="automationsTBody">
+                                <!-- Data will be populated here -->
                             </tbody>
                         </table>
+                        <div id="automationsEmpty" class="empty-state" style="display: none;">
+                            <div class="empty-state-icon">⚙️</div>
+                            <div class="empty-state-text">No automation data available</div>
+                            <div class="empty-state-subtext">Run the automation engine to generate data</div>
+                        </div>
                     </div>
                 </div>
 
@@ -902,7 +872,7 @@
                     <h2 class="section-title">🔗 Conversion Funnel Stages</h2>
 
                     <div class="table-container">
-                        <table>
+                        <table id="funnelTable">
                             <thead>
                                 <tr>
                                     <th>Stage</th>
@@ -913,98 +883,15 @@
                                     <th>Optimization</th>
                                 </tr>
                             </thead>
-                            <tbody>
-                                <tr>
-                                    <td style="font-weight: 600;">Landing Page</td>
-                                    <td>45,230</td>
-                                    <td>
-                                        <div style="display: flex; align-items: center; gap: 8px;">
-                                            <div class="progress-bar">
-                                                <div class="progress-fill" style="width: 100%;"></div>
-                                            </div>
-                                            100%
-                                        </div>
-                                    </td>
-                                    <td><span class="status-badge negative">0%</span></td>
-                                    <td>2m 15s</td>
-                                    <td><button class="btn btn-secondary btn-sm">Optimize</button></td>
-                                </tr>
-                                <tr>
-                                    <td style="font-weight: 600;">Sign Up</td>
-                                    <td>12,890</td>
-                                    <td>
-                                        <div style="display: flex; align-items: center; gap: 8px;">
-                                            <div class="progress-bar">
-                                                <div class="progress-fill" style="width: 85%;"></div>
-                                            </div>
-                                            28.5%
-                                        </div>
-                                    </td>
-                                    <td><span class="status-badge negative">71.5%</span></td>
-                                    <td>3m 42s</td>
-                                    <td><button class="btn btn-secondary btn-sm">Optimize</button></td>
-                                </tr>
-                                <tr>
-                                    <td style="font-weight: 600;">Email Verification</td>
-                                    <td>10,654</td>
-                                    <td>
-                                        <div style="display: flex; align-items: center; gap: 8px;">
-                                            <div class="progress-bar">
-                                                <div class="progress-fill" style="width: 82%;"></div>
-                                            </div>
-                                            82.6%</                                        </div>
-                                    </td>
-                                    <td><span class="status-badge negative">17.4%</span></td>
-                                    <td>1m 08s</td>
-                                    <td><button class="btn btn-secondary btn-sm">Optimize</button></td>
-                                </tr>
-                                <tr>
-                                    <td style="font-weight: 600;">Plan Selection</td>
-                                    <td>8,792</td>
-                                    <td>
-                                        <div style="display: flex; align-items: center; gap: 8px;">
-                                            <div class="progress-bar">
-                                                <div class="progress-fill" style="width: 73%;"></div>
-                                            </div>
-                                            82.5%
-                                        </div>
-                                    </td>
-                                    <td><span class="status-badge warning">17.5%</span></td>
-                                    <td>4m 32s</td>
-                                    <td><button class="btn btn-secondary btn-sm">Optimize</button></td>
-                                </tr>
-                                <tr>
-                                    <td style="font-weight: 600;">Payment</td>
-                                    <td>6,234</td>
-                                    <td>
-                                        <div style="display: flex; align-items: center; gap: 8px;">
-                                            <div class="progress-bar">
-                                                <div class="progress-fill" style="width: 71%;"></div>
-                                            </div>
-                                            70.9%
-                                        </div>
-                                    </td>
-                                    <td><span class="status-badge warning">29.1%</span></td>
-                                    <td>2m 55s</td>
-                                    <td><button class="btn btn-secondary btn-sm">Optimize</button></td>
-                                </tr>
-                                <tr>
-                                    <td style="font-weight: 600;">Account Setup</td>
-                                    <td>4,412</td>
-                                    <td>
-                                        <div style="display: flex; align-items: center; gap: 8px;">
-                                            <div class="progress-bar">
-                                                <div class="progress-fill" style="width: 70%;"></div>
-                                            </div>
-                                            70.7%
-                                        </div>
-                                    </td>
-                                    <td><span class="status-badge negative">29.3%</span></td>
-                                    <td>6m 18s</td>
-                                    <td><button class="btn btn-secondary btn-sm">Optimize</button></td>
-                                </tr>
+                            <tbody id="funnelTBody">
+                                <!-- Data will be populated here -->
                             </tbody>
                         </table>
+                        <div id="funnelEmpty" class="empty-state" style="display: none;">
+                            <div class="empty-state-icon">🔗</div>
+                            <div class="empty-state-text">No funnel data available</div>
+                            <div class="empty-state-subtext">Run the automation engine to generate funnel stages data</div>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -1012,12 +899,348 @@
     </div>
 
     <script>
+        /**
+         * Dashboard Data Manager
+         * Handles fetching and displaying data from dashboard_data.json
+         */
+        class DashboardDataManager {
+            constructor() {
+                this.dataUrl = 'dashboard_data.json';
+                this.data = null;
+                this.retryAttempts = 3;
+                this.retryDelay = 2000; // 2 seconds
+            }
+
+            /**
+             * Fetch dashboard data with retry logic
+             */
+            async fetchData() {
+                for (let attempt = 1; attempt <= this.retryAttempts; attempt++) {
+                    try {
+                        console.log(`Fetching dashboard data (attempt ${attempt}/${this.retryAttempts})...`);
+                        const response = await fetch(this.dataUrl);
+                        
+                        if (!response.ok) {
+                            throw new Error(`HTTP Error: ${response.status}`);
+                        }
+                        
+                        this.data = await response.json();
+                        console.log('Dashboard data loaded successfully:', this.data);
+                        this.updateStatus('loaded', 'Dashboard data loaded successfully');
+                        return this.data;
+                        
+                    } catch (error) {
+                        console.warn(`Attempt ${attempt} failed:`, error.message);
+                        
+                        if (attempt < this.retryAttempts) {
+                            console.log(`Retrying in ${this.retryDelay / 1000} seconds...`);
+                            await new Promise(resolve => setTimeout(resolve, this.retryDelay));
+                        }
+                    }
+                }
+                
+                // All retries failed
+                console.error('Failed to load dashboard data after all retries');
+                this.updateStatus('error', 'Dashboard data not available. Using sample data.');
+                return this.getDefaultData();
+            }
+
+            /**
+             * Get default sample data when JSON is not available
+             */
+            getDefaultData() {
+                return {
+                    timestamp: new Date().toISOString(),
+                    active_automations: 5,
+                    conversion_rate: 3.8,
+                    total_revenue: 24500,
+                    processed_tasks: 8942,
+                    automations: [
+                        {
+                            name: "Email Campaign Auto",
+                            automation_type: "Email",
+                            status: "active",
+                            executions: 3421,
+                            success_rate: 95,
+                            last_run: new Date(Date.now() - 2 * 60000).toISOString(),
+                            error_count: 171
+                        },
+                        {
+                            name: "Lead Scoring Pipeline",
+                            automation_type: "CRM",
+                            status: "active",
+                            executions: 1892,
+                            success_rate: 88,
+                            last_run: new Date(Date.now() - 5 * 60000).toISOString(),
+                            error_count: 227
+                        },
+                        {
+                            name: "Social Media Scheduler",
+                            automation_type: "Social",
+                            status: "active",
+                            executions: 562,
+                            success_rate: 72,
+                            last_run: new Date(Date.now() - 60 * 60000).toISOString(),
+                            error_count: 158
+                        },
+                        {
+                            name: "Invoice Generation Bot",
+                            automation_type: "Finance",
+                            status: "active",
+                            executions: 2145,
+                            success_rate: 92,
+                            last_run: new Date(Date.now() - 10 * 60000).toISOString(),
+                            error_count: 172
+                        },
+                        {
+                            name: "Data Sync Service",
+                            automation_type: "Integration",
+                            status: "error",
+                            executions: 421,
+                            success_rate: 45,
+                            last_run: new Date(Date.now() - 45 * 60000).toISOString(),
+                            error_count: 232
+                        }
+                    ],
+                    funnel_stages: [
+                        { stage: "landing_page", visitors: 45230, conversion_rate: 100, drop_rate: 0, average_time_seconds: 135, timestamp: new Date().toISOString() },
+                        { stage: "sign_up", visitors: 12890, conversion_rate: 28.5, drop_rate: 71.5, average_time_seconds: 222, timestamp: new Date().toISOString() },
+                        { stage: "email_verification", visitors: 10654, conversion_rate: 82.6, drop_rate: 17.4, average_time_seconds: 68, timestamp: new Date().toISOString() },
+                        { stage: "plan_selection", visitors: 8792, conversion_rate: 82.5, drop_rate: 17.5, average_time_seconds: 272, timestamp: new Date().toISOString() },
+                        { stage: "payment", visitors: 6234, conversion_rate: 70.9, drop_rate: 29.1, average_time_seconds: 175, timestamp: new Date().toISOString() },
+                        { stage: "account_setup", visitors: 4412, conversion_rate: 70.7, drop_rate: 29.3, average_time_seconds: 378, timestamp: new Date().toISOString() }
+                    ],
+                    metrics: {
+                        total_executions: 8441,
+                        total_successes: 7181,
+                        overall_success_rate: 85.08,
+                        collection_duration_seconds: 0
+                    }
+                };
+            }
+
+            /**
+             * Update status indicator
+             */
+            updateStatus(status, message) {
+                const statusEl = document.getElementById('dataStatus');
+                statusEl.className = `data-status ${status}`;
+                
+                let icon = '';
+                if (status === 'loading') {
+                    icon = '<span class="spinner"></span>';
+                } else if (status === 'loaded') {
+                    icon = '✓';
+                } else if (status === 'error') {
+                    icon = '⚠';
+                }
+                
+                statusEl.innerHTML = `${icon}<span>${message}</span>`;
+            }
+
+            /**
+             * Render stats cards
+             */
+            renderStats() {
+                if (!this.data) return;
+
+                const stats = [
+                    {
+                        label: 'Active Automations',
+                        value: this.data.active_automations,
+                        format: 'number',
+                        change: '+12% from last week',
+                        positive: true
+                    },
+                    {
+                        label: 'Conversion Rate',
+                        value: this.data.conversion_rate,
+                        format: 'percent',
+                        change: '+0.5% from last week',
+                        positive: true
+                    },
+                    {
+                        label: 'Total Revenue',
+                        value: this.data.total_revenue,
+                        format: 'currency',
+                        change: '+18% from last week',
+                        positive: true
+                    },
+                    {
+                        label: 'Processed Tasks',
+                        value: this.data.processed_tasks,
+                        format: 'number',
+                        change: '-3% from last week',
+                        positive: false
+                    }
+                ];
+
+                const grid = document.getElementById('statsGrid');
+                grid.innerHTML = stats.map(stat => `
+                    <div class="stat-card">
+                        <div class="stat-label">${stat.label}</div>
+                        <div class="stat-value">${this.formatValue(stat.value, stat.format)}</div>
+                        <span class="stat-change ${stat.positive ? 'positive' : 'negative'}">
+                            ${stat.change}
+                        </span>
+                    </div>
+                `).join('');
+            }
+
+            /**
+             * Format value based on type
+             */
+            formatValue(value, format) {
+                switch (format) {
+                    case 'currency':
+                        return `$${(value / 1000).toFixed(1)}K`;
+                    case 'percent':
+                        return `${value}%`;
+                    case 'number':
+                    default:
+                        return value.toLocaleString();
+                }
+            }
+
+            /**
+             * Render automations table
+             */
+            renderAutomations() {
+                if (!this.data || !this.data.automations || this.data.automations.length === 0) {
+                    document.getElementById('automationsTBody').innerHTML = '';
+                    document.getElementById('automationsEmpty').style.display = 'block';
+                    return;
+                }
+
+                document.getElementById('automationsEmpty').style.display = 'none';
+                const tbody = document.getElementById('automationsTBody');
+                
+                tbody.innerHTML = this.data.automations.map(auto => `
+                    <tr>
+                        <td style="font-weight: 600;">${auto.name}</td>
+                        <td>${auto.automation_type}</td>
+                        <td><span class="status-badge ${auto.status}">${this.capitalizeFirst(auto.status)}</span></td>
+                        <td>${auto.executions.toLocaleString()}</td>
+                        <td>
+                            <div style="display: flex; align-items: center; gap: 8px;">
+                                <div class="progress-bar">
+                                    <div class="progress-fill" style="width: ${auto.success_rate}%;"></div>
+                                </div>
+                                ${auto.success_rate}%
+                            </div>
+                        </td>
+                        <td>${this.formatTime(auto.last_run)}</td>
+                        <td><button class="btn btn-secondary btn-sm">Edit</button></td>
+                    </tr>
+                `).join('');
+            }
+
+            /**
+             * Render funnel stages table
+             */
+            renderFunnelStages() {
+                if (!this.data || !this.data.funnel_stages || this.data.funnel_stages.length === 0) {
+                    document.getElementById('funnelTBody').innerHTML = '';
+                    document.getElementById('funnelEmpty').style.display = 'block';
+                    return;
+                }
+
+                document.getElementById('funnelEmpty').style.display = 'none';
+                const tbody = document.getElementById('funnelTBody');
+                
+                tbody.innerHTML = this.data.funnel_stages.map(stage => `
+                    <tr>
+                        <td style="font-weight: 600;">${this.formatStageName(stage.stage)}</td>
+                        <td>${stage.visitors.toLocaleString()}</td>
+                        <td>
+                            <div style="display: flex; align-items: center; gap: 8px;">
+                                <div class="progress-bar">
+                                    <div class="progress-fill" style="width: ${stage.conversion_rate}%;"></div>
+                                </div>
+                                ${stage.conversion_rate}%
+                            </div>
+                        </td>
+                        <td><span class="status-badge ${stage.drop_rate > 30 ? 'warning' : 'active'}">${stage.drop_rate}%</span></td>
+                        <td>${this.formatSeconds(stage.average_time_seconds)}</td>
+                        <td><button class="btn btn-secondary btn-sm">Optimize</button></td>
+                    </tr>
+                `).join('');
+            }
+
+            /**
+             * Format stage name
+             */
+            formatStageName(stage) {
+                return stage.split('_').map(word => this.capitalizeFirst(word)).join(' ');
+            }
+
+            /**
+             * Capitalize first letter
+             */
+            capitalizeFirst(str) {
+                return str.charAt(0).toUpperCase() + str.slice(1);
+            }
+
+            /**
+             * Format seconds to human readable time
+             */
+            formatSeconds(seconds) {
+                const mins = Math.floor(seconds / 60);
+                const secs = seconds % 60;
+                return `${mins}m ${secs}s`;
+            }
+
+            /**
+             * Format relative time
+             */
+            formatTime(isoString) {
+                const date = new Date(isoString);
+                const now = new Date();
+                const diff = now - date;
+                const minutes = Math.floor(diff / 60000);
+                const hours = Math.floor(diff / 3600000);
+
+                if (minutes < 1) return 'Just now';
+                if (minutes < 60) return `${minutes} minute${minutes > 1 ? 's' : ''} ago`;
+                if (hours < 24) return `${hours} hour${hours > 1 ? 's' : ''} ago`;
+                return date.toLocaleDateString();
+            }
+
+            /**
+             * Render all data
+             */
+            render() {
+                this.renderStats();
+                this.renderAutomations();
+                this.renderFunnelStages();
+            }
+        }
+
+        // Initialize and load data
+        const dataManager = new DashboardDataManager();
+
+        async function initialize() {
+            try {
+                await dataManager.fetchData();
+                dataManager.render();
+            } catch (error) {
+                console.error('Initialization error:', error);
+                dataManager.updateStatus('error', 'Failed to initialize dashboard');
+            }
+        }
+
         // Toggle Sidebar
         const toggleButton = document.getElementById('toggleSidebar');
         const sidebar = document.getElementById('sidebar');
 
         toggleButton.addEventListener('click', () => {
             sidebar.classList.toggle('collapsed');
+        });
+
+        // Refresh button
+        document.getElementById('refreshBtn').addEventListener('click', async () => {
+            dataManager.updateStatus('loading', 'Refreshing dashboard data...');
+            await initialize();
         });
 
         // Active Link
@@ -1030,11 +1253,6 @@
             });
         });
 
-        // Search functionality placeholder
-        document.querySelector('.search-bar input')?.addEventListener('input', (e) => {
-            console.log('Search:', e.target.value);
-        });
-
         // Responsive sidebar for mobile
         if (window.innerWidth < 768) {
             sidebar.classList.add('collapsed');
@@ -1045,6 +1263,9 @@
                 sidebar.classList.add('collapsed');
             }
         });
+
+        // Initialize on page load
+        document.addEventListener('DOMContentLoaded', initialize);
     </script>
 </body>
 </html>
