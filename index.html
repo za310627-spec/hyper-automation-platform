@@ -253,6 +253,11 @@
             color: #fff;
         }
 
+        .status-badge.success {
+            background: #10b981;
+            color: #0f172a;
+        }
+
         .loading {
             display: flex;
             justify-content: center;
@@ -432,6 +437,16 @@
             animation: pulse 1.5s ease-in-out infinite;
         }
 
+        .history-section {
+            margin-top: 30px;
+        }
+
+        .history-logs-count {
+            font-size: 0.85rem;
+            color: #94a3b8;
+            margin-top: 10px;
+        }
+
         @keyframes slideIn {
             from {
                 opacity: 0;
@@ -540,12 +555,25 @@
         </div>
 
         <div class="card">
-            <h2>📊 حالة العمليات</h2>
+            <h2>📊 حالة العمليات الحالية</h2>
             <div class="table-container">
                 <div id="tableContent" class="loading">
                     <div class="spinner"></div>
                     <span>جاري تحميل البيانات...</span>
                 </div>
+            </div>
+        </div>
+
+        <div class="card history-section">
+            <h2>📋 سجل العمليات التاريخي</h2>
+            <div class="table-container">
+                <div id="historyContent" class="loading">
+                    <div class="spinner"></div>
+                    <span>جاري تحميل السجل التاريخي...</span>
+                </div>
+            </div>
+            <div class="history-logs-count">
+                <span id="historyLogsInfo">آخر 5 عمليات مكتملة</span>
             </div>
         </div>
     </div>
@@ -627,10 +655,12 @@
         // Load dashboard data from JSON
         function loadDashboardData(isAutoRefresh = false) {
             const tableContent = document.getElementById('tableContent');
+            const historyContent = document.getElementById('historyContent');
             
             // Only show loading state on manual refresh, not on auto-refresh
             if (!isAutoRefresh) {
                 tableContent.innerHTML = '<div class="loading"><div class="spinner"></div><span>جاري تحميل البيانات...</span></div>';
+                historyContent.innerHTML = '<div class="loading"><div class="spinner"></div><span>جاري تحميل السجل التاريخي...</span></div>';
             }
 
             fetch('dashboard_data.json')
@@ -654,6 +684,17 @@
                         updateStatusFromData(data);
                     }
                     
+                    // Display history logs
+                    if (data.history_logs && Array.isArray(data.history_logs)) {
+                        displayHistoryLogs(data.history_logs);
+                    } else {
+                        historyContent.innerHTML = `
+                            <div class="empty-state">
+                                <p>لا توجد سجلات تاريخية</p>
+                            </div>
+                        `;
+                    }
+                    
                     // Log successful auto-refresh
                     if (isAutoRefresh) {
                         console.log('Auto-refresh completed at:', new Date().toLocaleTimeString());
@@ -669,8 +710,85 @@
                                 <p style="margin-top: 10px; font-size: 0.9rem;">تأكد من وجود ملف dashboard_data.json</p>
                             </div>
                         `;
+                        historyContent.innerHTML = `
+                            <div class="empty-state">
+                                <p>لم يتم تحميل السجل التاريخي</p>
+                            </div>
+                        `;
                     }
                 });
+        }
+
+        // Display historical logs in table
+        function displayHistoryLogs(historyLogs) {
+            const historyContent = document.getElementById('historyContent');
+            
+            // Get last 5 completed tasks
+            const recentLogs = historyLogs.slice(0, 5);
+
+            if (!recentLogs || recentLogs.length === 0) {
+                historyContent.innerHTML = `
+                    <div class="empty-state">
+                        <p>لا توجد سجلات تاريخية</p>
+                    </div>
+                `;
+                document.getElementById('historyLogsInfo').textContent = 'لا توجد عمليات مكتملة';
+                return;
+            }
+
+            let tableHTML = `
+                <table>
+                    <thead>
+                        <tr>
+                            <th>رقم السجل</th>
+                            <th>اسم العملية</th>
+                            <th>وقت الإتمام</th>
+                            <th>النتيجة</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+            `;
+
+            recentLogs.forEach((log) => {
+                const logId = log.id || log.ID || '-';
+                const processName = log.process_name || log.name || log.process_name || 'عملية';
+                const completionTime = log.completion_time || log.time || '-';
+                const statusBadge = getHistoryStatusBadge(log.status);
+
+                tableHTML += `
+                    <tr>
+                        <td>${logId}</td>
+                        <td>${processName}</td>
+                        <td>${formatTime(completionTime)}</td>
+                        <td>${statusBadge}</td>
+                    </tr>
+                `;
+            });
+
+            tableHTML += `
+                    </tbody>
+                </table>
+            `;
+
+            historyContent.innerHTML = tableHTML;
+            document.getElementById('historyLogsInfo').textContent = `آخر ${recentLogs.length} عملية مكتملة`;
+        }
+
+        // Get status badge for history logs
+        function getHistoryStatusBadge(status) {
+            const statusLower = (status || '').toLowerCase();
+            let badgeClass = 'pending';
+            let displayText = status;
+
+            if (statusLower === 'success' || statusLower === 'نجاح' || statusLower === 'completed' || statusLower === 'مكتملة') {
+                badgeClass = 'success';
+                displayText = '✓ نجاح';
+            } else if (statusLower === 'failed' || statusLower === 'فاشلة' || statusLower === 'فشل') {
+                badgeClass = 'failed';
+                displayText = '✗ فشل';
+            }
+
+            return `<span class="status-badge ${badgeClass}">${displayText}</span>`;
         }
 
         // Update status indicator based on data
@@ -681,20 +799,20 @@
             if (data.status) {
                 const statusLower = data.status.toLowerCase();
                 
-                if (statusLower === 'running') {
+                if (statusLower === 'running' || statusLower === 'جاري التنفيذ') {
                     statusDot.className = 'status-dot running';
                     const progress = data.progress || 0;
                     statusText.textContent = `جاري التنفيذ... (${progress}% من التقدم)`;
-                } else if (statusLower === 'completed') {
+                } else if (statusLower === 'completed' || statusLower === 'مكتمل' || statusLower === 'مكتملة') {
                     statusDot.className = 'status-dot ready';
                     statusText.textContent = 'تمت بنجاح! (100% من التقدم)';
-                } else if (statusLower === 'failed') {
+                } else if (statusLower === 'failed' || statusLower === 'فاشلة' || statusLower === 'فشل') {
                     statusDot.className = 'status-dot error';
                     statusText.textContent = 'فشل التنفيذ - يرجى المراجعة';
-                } else if (statusLower === 'pending') {
+                } else if (statusLower === 'pending' || statusLower === 'قيد الانتظار') {
                     statusDot.className = 'status-dot running';
                     statusText.textContent = 'في انتظار البدء...';
-                } else if (statusLower === 'paused') {
+                } else if (statusLower === 'paused' || statusLower === 'متوقف') {
                     statusDot.className = 'status-dot running';
                     statusText.textContent = 'متوقف مؤقتاً...';
                 }
@@ -779,7 +897,7 @@
 
             if (statusLower === 'completed' || statusLower === 'مكتملة') {
                 badgeClass = 'completed';
-                displayText = '✓ ��كتملة';
+                displayText = '✓ مكتملة';
             } else if (statusLower === 'failed' || statusLower === 'فاشلة') {
                 badgeClass = 'failed';
                 displayText = '✗ فاشلة';
