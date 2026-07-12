@@ -727,15 +727,21 @@
             const statusDot = document.getElementById('statusDot');
             const statusText = document.getElementById('statusText');
 
+            // Step 1: Set status to Running with 30% progress
+            console.log('Step 1: Starting automation process - Status: Running, Progress: 30%');
             statusDot.className = 'status-dot running';
-            statusText.textContent = 'جاري تشغيل محرك الأتمتة...';
+            statusText.textContent = 'جاري تشغيل محرك الأتمتة... (30% من التقدم)';
 
+            // Step 2: Wait for 2 seconds, then update to Completed with 100% progress
             setTimeout(() => {
+                console.log('Step 2: Automation process completed - Status: Completed, Progress: 100%');
                 statusDot.className = 'status-dot ready';
-                statusText.textContent = 'تمت الأتمتة بنجاح! تم تحديث البيانات.';
+                statusText.textContent = 'تمت الأتمتة بنجاح! (100% من التقدم)';
                 loadDashboardData();
 
+                // Step 3: Reset to ready state after 2 more seconds
                 setTimeout(() => {
+                    console.log('Step 3: Reset to ready state');
                     statusText.textContent = 'جاهز للعمل';
                 }, 2000);
             }, 2000);
@@ -777,7 +783,7 @@
 
         // Show help
         function showHelp() {
-            alert('مرحباً! هذه لوحة التحكم الرئيسية لمنصة الأتمتة الفائقة.\n\nاستخدم الأزرار أعلاه لتشغيل العمليات وتحديث البيانات.\nاستخدم القائمة الجانبية للتنقل بين الأقسام المختلفة.');
+            alert('مرحباً! هذه لوحة التحكم الرئيسية لمنصة الأتمتة الفائقة.\n\nاستخدم الأزرار أعلاه لتشغيل العمليات و[...]
         }
 
         // Show error message
