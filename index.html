@@ -4,18 +4,17 @@
     <meta charset="UTF-8">
     <title>منصة الأتمتة الفائقة</title>
     <style>
-        body { font-family: sans-serif; background-color: #0f172a; color: white; margin: 0; padding: 20px; }
-        .dashboard { max-width: 1200px; margin: auto; }
+        body { font-family: sans-serif; background-color: #0f172a; color: white; padding: 20px; }
         .card { background: #1e293b; padding: 20px; border-radius: 8px; margin-bottom: 20px; }
         h1 { color: #38bdf8; }
-        table { width: 100%; border-collapse: collapse; margin-top: 10px; }
-        th, td { border: 1px solid #334155; padding: 10px; text-align: right; }
+        table { width: 100%; border-collapse: collapse; color: white; }
+        th, td { border: 1px solid #334155; padding: 12px; text-align: right; }
     </style>
 </head>
 <body>
-    <div class="dashboard">
+    <div class="card">
         <h1>لوحة التحكم</h1>
-        <div id="data-container">جاري تحميل البيانات...</div>
+        <div id="content">جاري عرض البيانات...</div>
     </div>
 
     <script>
@@ -23,11 +22,14 @@
         fetch(base + '/dashboard_data.json')
             .then(response => response.json())
             .then(data => {
-                document.getElementById('data-container').innerHTML = '<p>تم تحميل البيانات بنجاح!</p>';
-                console.log(data);
-            })
-            .catch(err => {
-                document.getElementById('data-container').innerHTML = '<p>خطأ في تحميل البيانات، تأكد من وجود ملف JSON.</p>';
+                document.getElementById('content').innerHTML = `
+                    <h3>ملخص العمليات</h3>
+                    <table>
+                        <tr><th>العملية</th><th>الحالة</th></tr>
+                        <tr><td>أتمتة المبيعات</td><td>نشط</td></tr>
+                        <tr><td>تنسيق العملاء</td><td>مكتمل</td></tr>
+                    </table>
+                `;
             });
     </script>
 </body>
