@@ -1,0 +1,38 @@
+{
+  "process_name": "Hyper Automation Process",
+  "status": "Pending",
+  "progress": 0,
+  "last_updated": "2026-07-13T00:00:00Z",
+  "history_logs": [
+    {
+      "id": "H001",
+      "process_name": "Email Campaign Auto",
+      "completion_time": "2026-07-12T22:45:30Z",
+      "status": "Success"
+    },
+    {
+      "id": "H002",
+      "process_name": "Lead Scoring Pipeline",
+      "completion_time": "2026-07-12T22:30:15Z",
+      "status": "Success"
+    },
+    {
+      "id": "H003",
+      "process_name": "Social Media Scheduler",
+      "completion_time": "2026-07-12T22:15:45Z",
+      "status": "Failed"
+    },
+    {
+      "id": "H004",
+      "process_name": "Invoice Generation Bot",
+      "completion_time": "2026-07-12T22:00:20Z",
+      "status": "Success"
+    },
+    {
+      "id": "H005",
+      "process_name": "Data Sync Service",
+      "completion_time": "2026-07-12T21:45:00Z",
+      "status": "Success"
+    }
+  ]
+}
